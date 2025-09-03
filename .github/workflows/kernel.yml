@@ -5,34 +5,37 @@ on:
 
 jobs:
   build:
+    name: Compile Kernel
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Kernel Source
+    - name: 📦 Checkout Kernel Source
       uses: actions/checkout@v4
 
-    - name: Set up build dependencies
+    - name: ⚙️ Install Build Dependencies
       run: |
         sudo apt update
-        sudo apt install -y bc bison build-essential curl flex git libssl-dev libncurses5-dev libncursesw5-dev libelf-dev ccache python3 unzip
+        sudo apt install -y \
+          bc bison build-essential curl flex git libssl-dev \
+          libncurses5-dev libncursesw5-dev libelf-dev ccache python3 unzip
 
-    - name: Download Toolchain (aarch64)
+    - name: 🛠️ Download Toolchain (GCC)
       run: |
         git clone --depth=1 https://github.com/arter97/arm64-gcc.git gcc
-        echo "TOOLCHAIN INSTALLED"
+        echo "Toolchain downloaded."
 
-    - name: Compile Kernel
+    - name: 🔨 Build Kernel
       run: |
         export ARCH=arm64
         export SUBARCH=arm64
         export CROSS_COMPILE=$(pwd)/gcc/bin/aarch64-linux-gnu-
         export PATH=$(pwd)/gcc/bin:$PATH
 
-        make exynos7904_defconfig
+        make m30lte_defconfig
         make -j$(nproc)
 
-    - name: Upload Kernel Image
+    - name: 📤 Upload Kernel Image
       uses: actions/upload-artifact@v4
       with:
-        name: Image
+        name: Image.gz
         path: arch/arm64/boot/Image.gz
