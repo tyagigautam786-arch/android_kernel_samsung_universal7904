@@ -19,15 +19,17 @@ jobs:
         libssl-dev libncurses5-dev libncursesw5-dev libelf-dev \
         ccache python3 unzip
 
-    - name: 🛠️ Download Proton Clang
+    - name: 🛠️ Download AOSP Clang
       run: |
-        git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang
+        mkdir -p toolchain
+        curl -LO https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android12-release/clang-r416183b.tar.gz
+        tar -xf clang-r416183b.tar.gz -C toolchain
 
-    - name: 🔨 Build Kernel with Clang
+    - name: 🔨 Build Kernel with AOSP Clang
       run: |
         export ARCH=arm64
         export SUBARCH=arm64
-        export CLANG_PATH=$(pwd)/clang
+        export CLANG_PATH=$(pwd)/toolchain
         export PATH=$CLANG_PATH/bin:$PATH
         export ANDROID_MAJOR_VERSION=r
 
